@@ -1,0 +1,24 @@
+{
+  "name": "whatsapp-chat-bot",
+  "version": "1.0.0",
+  "description": "Whatsapp Chatbot",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "api",
+    "bot",
+    "bot-api",
+    "whatsapp",
+    "whatsapp-web",
+    "whatsapp-bot",
+    "whatsapp-api",
+    "whatsapp-web-api"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "whatsapp-web.js": "^1.17.1"
+  }
+}
