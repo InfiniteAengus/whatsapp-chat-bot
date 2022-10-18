@@ -35,6 +35,7 @@ const steps = [
 ];
 module.exports = (client) => {
   client.on('message', (msg) => {
+    console.log(msg.fromMe, msg.body);
     if (msg.fromMe) {
       return;
     }
