@@ -39,6 +39,7 @@ module.exports = (client) => {
     if (msg.fromMe) {
       return;
     }
+
     if (logs[msg.from] === undefined) {
       logs[msg.from] = { step: 0, answers: {} };
     } else {
@@ -68,7 +69,7 @@ module.exports = (client) => {
       );
       logs[msg.from] = undefined;
     } else {
-      msg.reply(steps[logs[msg.from].step]);
+      msg.reply(steps[logs[msg.from].step].Message);
     }
   });
 };
