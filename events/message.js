@@ -1,7 +1,7 @@
 // const client = require('..');
 const qrcode = require('qrcode-terminal');
 
-const logs = {};
+let logs = {};
 
 const steps = [
   {
@@ -35,7 +35,7 @@ const steps = [
 ];
 module.exports = (client) => {
   client.on('message', (msg) => {
-    console.log(msg.fromMe, msg.body);
+    console.log(msg.id);
     if (msg.fromMe) {
       return;
     }
@@ -45,9 +45,10 @@ module.exports = (client) => {
     } else {
       const previousStep = logs[msg.from].step;
       const key = steps[previousStep].Key;
-      const promiseStepInd = steps[previousStep].Promise?.findIndex(
-        (promise) => promise.answer.toLowerCase() === msg.body.toLowerCase()
-      );
+      const promiseStepInd =
+        steps[previousStep].Promise?.findIndex(
+          (promise) => promise.answer.toLowerCase() === msg.body.toLowerCase()
+        ) ?? -1;
 
       if (key) {
         logs[msg.from].answers[key] = msg.body;
