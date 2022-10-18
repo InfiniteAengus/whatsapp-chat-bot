@@ -1,8 +1,6 @@
 // const client = require('..');
 const qrcode = require('qrcode-terminal');
 
-let logs = {};
-
 const steps = [
   {
     Message: `Welcome to Jay WhatsApp Chatbot.
@@ -34,8 +32,9 @@ const steps = [
   },
 ];
 module.exports = (client) => {
+  let logs = {};
   client.on('message', (msg) => {
-    console.log(msg.id);
+    console.log(logs);
     if (msg.fromMe) {
       return;
     }
@@ -47,7 +46,7 @@ module.exports = (client) => {
       const key = steps[previousStep].Key;
       const promiseStepInd =
         steps[previousStep].Promise?.findIndex(
-          (promise) => promise.answer.toLowerCase() === msg.body.toLowerCase()
+          (promise) => promise.Answer.toLowerCase() === msg.body.toLowerCase()
         ) ?? -1;
 
       if (key) {
@@ -60,17 +59,20 @@ module.exports = (client) => {
           : steps[previousStep].Promise[promiseStepInd].NextStep;
     }
 
+    console.log(logs[msg.from].step);
+    
     if (logs[msg.from].step === -1) {
       const answers = logs[msg.from].answers;
-      msg.reply(
+      client.sendMessage(
+        msg.id.id,
         `Congratulations ${answers['FirstName']}. These  are your details.
         
-        Name: ${answers['FirstName']} ${answers['SurName']}
-        Address: ${answers['Address']}`
+      Name: ${answers['FirstName']} ${answers['SurName']}
+      Address: ${answers['Address']}`
       );
       logs[msg.from] = undefined;
     } else {
-      msg.reply(steps[logs[msg.from].step].Message);
+      client.sendMessage(msg.id.id, steps[logs[msg.from].step].Message);
     }
   });
 };
