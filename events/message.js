@@ -30,6 +30,7 @@ module.exports = (client) => {
 
     const command = msg.body.toLowerCase();
 
+    console.log(command, curUserStep);
     for (let child of curUserStep.step.children) {
       if (matchCommand(command, child.command)) {
         const nextStep = findStep(child.id);
