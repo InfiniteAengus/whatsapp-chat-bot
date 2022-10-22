@@ -18,7 +18,8 @@ module.exports = (client) => {
       return command === commandFormat.toLowerCase();
     }
   };
-  client.on('message', (msg) => {
+  client.on('message', async (msg) => {
+    const chat = await msg.getChat();
     if (msg.fromMe) {
       return;
     }
@@ -51,12 +52,11 @@ module.exports = (client) => {
       curUserStep.step.children === undefined ||
       curUserStep.step.children.length === 0
     ) {
-      client.sendMessage(
-        msg.id.id,
+      chat.sendMessage(
         `You ordered ${curUserStep.answers['amount']} of ${curUserStep.answers['product']}`
       );
       currentStep[msg.from] = undefined;
     }
-    client.sendMessage(msg.id.id, curUserStep.step.message);
+    chat.sendMessage(curUserStep.step.message);
   });
 };
