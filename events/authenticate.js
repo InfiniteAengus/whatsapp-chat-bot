@@ -13,4 +13,9 @@ module.exports = (client) => {
   client.on('ready', () => {
     console.log('Client is ready!');
   });
+
+  client.on('auth_failure', (msg) => {
+    console.log('Auth fail ', msg);
+    client.initialize();
+  });
 };
