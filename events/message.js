@@ -53,6 +53,7 @@ module.exports = (client) => {
         msg.id.id,
         `You ordered ${curUserStep.answers['amount']} of ${curUserStep.answers['product']}`
       );
+      currentStep[msg.from] = undefined;
     }
     client.sendMessage(msg.id.id, currentStep.message);
   });
