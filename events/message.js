@@ -26,23 +26,24 @@ module.exports = (client) => {
     const curUserStep = currentStep[msg.from];
     if (curUserStep === undefined) {
       curUserStep = { step: steps[0], answers: {} };
-    } else {
-      const command = msg.body.toLowerCase();
+    }
 
-      for (let child of curUserStep.step.children) {
-        if (matchCommand(command, child.command)) {
-          const nextStep = findStep(child.id);
-          let answers = curUserStep.answers;
-          if (nextStep.value) {
-            answers = {
-              ...answers,
-              [nextStep.value]: child.value ?? command,
-            };
-          }
-          curUserStep = { step: nextStep, answers: answers };
+    const command = msg.body.toLowerCase();
+
+    for (let child of curUserStep.step.children) {
+      if (matchCommand(command, child.command)) {
+        const nextStep = findStep(child.id);
+        let answers = curUserStep.answers;
+        if (nextStep.value) {
+          answers = {
+            ...answers,
+            [nextStep.value]: child.value ?? command,
+          };
         }
+        curUserStep = { step: nextStep, answers: answers };
       }
     }
+
     currentStep[msg.from] = curUserStep;
 
     if (
