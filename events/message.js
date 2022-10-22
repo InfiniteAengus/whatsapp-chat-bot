@@ -1,78 +1,59 @@
 // const client = require('..');
 const qrcode = require('qrcode-terminal');
+const steps = require('../data/config');
 
-const steps = [
-  {
-    Message: `Welcome to Jay WhatsApp Chatbot.
-    You are not registered.
-    Type "Yes" to register and experience the freedom of making payments on WhatsApp.`,
-    Promise: [{ Answer: 'Yes', NextStep: 1 }],
-    NextStep: 0,
-  },
-  {
-    Message: `Welcome to Registration. Let's get to know you.
-    What's your first name that is written on your ID or Passport?
-    
-    DO NOT INCLUDE SURNAME`,
-    NextStep: 2,
-    Key: 'FirstName',
-  },
-  {
-    Message: `What is your surname that appears on your ID or Passport?`,
-    NextStep: 3,
-    Key: 'SurName',
-  },
-  {
-    Message: `Perfect
-    
-    Enter your residential address? Example: 13 Sands Street, Sandton, Johannesburg, South Africa
-    `,
-    NextStep: -1,
-    Key: 'Address',
-  },
-];
 module.exports = (client) => {
-  let logs = {};
+  let currentStep = {};
+
+  const findStep = (index) => {
+    return steps.find((step) => step.id === index);
+  };
+
+  const matchCommand = (command, commandFormat) => {
+    if (commandFormat === '**number**') {
+      return command === Number(command).toString();
+    } else if (commandFormat === '**any**') {
+      return true;
+    } else {
+      return command === commandFormat.toLowerCase();
+    }
+  };
   client.on('message', (msg) => {
-    console.log(logs);
     if (msg.fromMe) {
       return;
     }
 
-    if (logs[msg.from] === undefined) {
-      logs[msg.from] = { step: 0, answers: {} };
+    const curUserStep = currentStep[msg.from];
+    if (curUserStep === undefined) {
+      curUserStep = { step: steps[0], answers: {} };
     } else {
-      const previousStep = logs[msg.from].step;
-      const key = steps[previousStep].Key;
-      const promiseStepInd =
-        steps[previousStep].Promise?.findIndex(
-          (promise) => promise.Answer.toLowerCase() === msg.body.toLowerCase()
-        ) ?? -1;
+      const command = msg.body.toLowerCase();
 
-      if (key) {
-        logs[msg.from].answers[key] = msg.body;
+      for (let child of curUserStep.step.children) {
+        if (matchCommand(command, child.command)) {
+          const nextStep = findStep(child.id);
+          let answers = curUserStep.answers;
+          if (nextStep.value) {
+            answers = {
+              ...answers,
+              [nextStep.value]: child.value ?? command,
+            };
+          }
+          curUserStep = { step: nextStep, answers: answers };
+        }
       }
-
-      logs[msg.from].step =
-        promiseStepInd === -1
-          ? steps[previousStep].NextStep
-          : steps[previousStep].Promise[promiseStepInd].NextStep;
     }
+    currentStep[msg.from] = curUserStep;
 
-    console.log(logs[msg.from].step);
-    
-    if (logs[msg.from].step === -1) {
-      const answers = logs[msg.from].answers;
+    if (
+      curUserStep.step.children === undefined ||
+      curUserStep.step.children.length === 0
+    ) {
       client.sendMessage(
         msg.id.id,
-        `Congratulations ${answers['FirstName']}. These  are your details.
-        
-      Name: ${answers['FirstName']} ${answers['SurName']}
-      Address: ${answers['Address']}`
+        `You ordered ${curUserStep.answers['amount']} of ${curUserStep.answers['product']}`
       );
-      logs[msg.from] = undefined;
-    } else {
-      client.sendMessage(msg.id.id, steps[logs[msg.from].step].Message);
     }
+    client.sendMessage(msg.id.id, currentStep.message);
   });
 };
