@@ -89,4 +89,4 @@ const steps = [
   },
 ];
 
-export default steps;
+module.exports = steps;

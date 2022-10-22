@@ -55,6 +55,6 @@ module.exports = (client) => {
       );
       currentStep[msg.from] = undefined;
     }
-    client.sendMessage(msg.id.id, currentStep.message);
+    client.sendMessage(msg.id.id, curUserStep.message);
   });
 };
